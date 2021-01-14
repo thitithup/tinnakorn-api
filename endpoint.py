@@ -500,6 +500,381 @@ def get_opportunities():
     return jsonify(result), 200
 
 
+@app.route('/getPriorities', methods=['GET'])
+def get_priorities():
+    user_name = request.args.get('Username', False)
+    password = request.args.get('Password', False)
+    company = request.args.get('Company', False)
+
+    result = [
+        {
+            "key": "0",
+            "value": "Very Low"
+        },
+        {
+            "key": "1",
+            "value": "Low"
+        },
+        {
+            "key": "2",
+            "value": "Normal"
+
+        },
+        {
+            "key": "3",
+            "value": "High"
+        },
+        {
+            "key": "4",
+            "value": "Very High"
+        }
+    ]
+
+    if user_name and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+
+    return jsonify(result), 200
+
+
+@app.route('/getOpportunitiesFilter', methods=['GET'])
+def get_opportunitiesFilter():
+    user_name = request.args.get('Username', False)
+    password = request.args.get('Password', False)
+    company = request.args.get('Company', False)
+
+    result = [
+        {
+            "key": "show all",
+            "value": "Show ALL"
+        },
+        {
+            "key": "new",
+            "value": "New"
+        },
+        {
+            "key": "on going",
+            "value": "On Going"
+        },
+        {
+            "key": "done",
+            "value": "Done"
+        }
+    ]
+
+    if user_name and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+
+    return jsonify(result), 200
+
+
+@app.route('/getReasons', methods=['GET'])
+def get_Reasons():
+    user_id = int(request.args.get('UserId', 0))
+    user_name = request.args.get('Username', False)
+    password = request.args.get('Password', False)
+    company = request.args.get('Company', False)
+    offset = request.args.get('Offset', False) or 0
+    page_size = request.args.get('pazeSize', False) or 10
+
+    result = []
+
+    if user_name and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        if connection:
+            model = connection.get_model("ineco.ship.late.reason")
+            ids = model.search([])
+            record_count = 0
+            do_count = 0
+            for id in ids:
+                if record_count >= int(offset):
+                    do_count += 1
+                    if do_count <= int(page_size):
+                        reason_info = model.read(id, ["id", "name"])
+                        result.append(reason_info)
+                record_count += 1
+
+    return jsonify(result), 200
+
+
+@app.route('/getStages', methods=['GET'])
+def get_stages():
+    user_id = int(request.args.get('UserId', 0))
+    user_name = request.args.get('Username', False)
+    password = request.args.get('Password', False)
+    company = request.args.get('Company', False)
+    offset = request.args.get('Offset', False) or 0
+    page_size = request.args.get('pazeSize', False) or 10
+
+    result = []
+
+    if user_name and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        if connection:
+            model = connection.get_model("crm.case.stage")
+            ids = model.search([])
+            record_count = 0
+            do_count = 0
+            for id in ids:
+                if record_count >= int(offset):
+                    do_count += 1
+                    if do_count <= int(page_size):
+                        stages_info = model.read(id, ["id", "name"])
+                        result.append(stages_info)
+                record_count += 1
+
+    return jsonify(result), 200
+
+
+@app.route('/getTaskMessage', methods=['GET'])
+def get_taskmessage():
+    user_id = int(request.args.get('UserId', 0))
+    user_name = request.args.get('Username', False)
+    password = request.args.get('Password', False)
+    company = request.args.get('Company', False)
+    offset = request.args.get('Offset', False) or 0
+    page_size = request.args.get('pazeSize', False) or 10
+
+    result = []
+
+    if user_name and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        if connection:
+            model = connection.get_model("ineco.web.task")
+            ids = model.search([])
+            record_count = 0
+            do_count = 0
+            for id in ids:
+                if record_count >= int(offset):
+                    do_count += 1
+                    if do_count <= int(page_size):
+                        taskmessage_info = model.read(id, ["id", "name", "notes", "state", "create_date"])
+                        result.append(taskmessage_info)
+                record_count += 1
+
+    return jsonify(result), 200
+
+
+@app.route('/getWebTaskType', methods=['GET'])
+def get_webtasktype():
+    user_name = request.args.get('Username', False)
+    password = request.args.get('Password', False)
+    company = request.args.get('Company', False)
+
+    result = [
+        {
+            "key": "New SO",
+            "value": "New SO"
+        },
+        {
+            "key": "New Quotation",
+            "value": "New Quotation"
+        },
+        {
+            "key": "Request Documents",
+            "value": "Request Documents"
+        },
+        {
+            "key": "Others",
+            "value": "Others"
+        }
+    ]
+
+    if user_name and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+
+    return jsonify(result), 200
+
+
+@app.route('/getSalesOrders', methods=['GET'])
+def get_salesorders():
+    user_id = int(request.args.get('UserId', 0))
+    user_name = request.args.get('Username', False)
+    password = request.args.get('Password', False)
+    company = request.args.get('Company', False)
+    offset = request.args.get('Offset', False) or 0
+    page_size = request.args.get('pazeSize', False) or 10
+    customer_id = int(request.args.get('CustomerId', 0))
+    flag = request.args.get('flgIsPending', False)
+
+    result = []
+
+    if user_name and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        if connection:
+            model = connection.get_model("sale.order")
+            model2 = connection.get_model("sale.order.line")
+            ids = model.search([("partner_id", "=", customer_id)])
+            # ids = model.search([("partner_id", "=", customer_id)])
+            record_count = 0
+            do_count = 0
+            for id in ids:
+                if record_count >= int(offset):
+                    do_count += 1
+                    if do_count <= int(page_size):
+                        saleorder_info = model.read(id,
+                                                    ["id", "name", "partner_id", "partner_invoice_id", "currency_id",
+                                                     "partner_shipping_id", "date_order", "requested_date",
+                                                     "client_order_ref", "state","order_line"])
+
+                        # result.append(saleorder_info)
+                        line_ids = model2.search([("id", "in", saleorder_info["order_line"])])
+                        for line_id in line_ids:
+                            saleorderline_info = model2.read(line_id, ["id", "name", "product_id",
+                                                                       "product_uom_qty", "product_uom", "price_unit",
+                                                                       "price_subtotal", "tax_id", "order_id"])
+                            saleorder_info['saleRequestLines'] = saleorderline_info
+
+                            result.append(saleorder_info)
+                record_count += 1
+
+    return jsonify(result), 200
+
+
+@app.route('/getSalesPriceRequest', methods=['GET'])
+def get_salepricereq():
+    user_id = int(request.args.get('UserId', 0))
+    user_name = request.args.get('Username', False)
+    password = request.args.get('Password', False)
+    company = request.args.get('Company', False)
+    offset = request.args.get('Offset', False) or 0
+    page_size = request.args.get('pazeSize', False) or 10
+    request_name = request.args.get('requestName', False)
+    customer_id = request.args.get('customerId', 0)
+    customer_name = request.args.get('customerName', False)
+
+    result = []
+
+    if user_name and password and company and customer_id:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=user_name, password=password)
+            connection.check_login()
+        if connection:
+            model = connection.get_model("sale.price.req")
+            model2 = connection.get_model("sale.price.req.line")
+            ids = model.search(['|', ("name", "=", request_name), ("partner_id", "=", customer_id)])
+            record_count = 0
+            do_count = 0
+            for id in ids:
+                if record_count >= int(offset):
+                    do_count += 1
+                    if do_count <= int(page_size):
+                        salepricereq_info = model.read(id, ["id", "name", "partner_id", "partner_fin_product",
+                                                            "approver_id", "request_date",
+                                                            "state", "line_ids"])
+
+                        # print(salepricereq_info)
+                        line_ids = model2.search([("id", "in", salepricereq_info["line_ids"])])
+                        for line_id in line_ids:
+                            salepricereqline_info = model2.read(line_id,
+                                                                ["product_id", "is_new_product",
+                                                                 "quantity_time", "quantity_year",
+                                                                 "uom", "product_name",
+                                                                 "product_comment", "product_comp_country",
+                                                                 "product_comp_price", "product_comp_unit",
+                                                                 "product_app_price", "product_app_unit",
+                                                                 "product_app_comment"])
+                            salepricereq_info['saleRequestLines'] = salepricereqline_info
+
+                            result.append(salepricereq_info)
+                record_count += 1
+
+    return jsonify(result), 200
+
+
 if __name__ == '__main__':
     app.debug = False
     app.run(host='0.0.0.0', port=8000)
