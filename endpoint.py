@@ -787,8 +787,9 @@ def get_salesorders():
         if connection:
             model = connection.get_model("sale.order")
             model2 = connection.get_model("sale.order.line")
+            model_tax = connection.get_model("account.tax")
+
             ids = model.search([("partner_id", "=", customer_id)])
-            # ids = model.search([("partner_id", "=", customer_id)])
             record_count = 0
             do_count = 0
             for id in ids:
@@ -798,15 +799,23 @@ def get_salesorders():
                         saleorder_info = model.read(id,
                                                     ["id", "name", "partner_id", "partner_invoice_id", "currency_id",
                                                      "partner_shipping_id", "date_order", "requested_date",
-                                                     "client_order_ref", "state","order_line"])
+                                                     "client_order_ref", "state", "order_line"])
 
-                        # result.append(saleorder_info)
                         line_ids = model2.search([("id", "in", saleorder_info["order_line"])])
                         for line_id in line_ids:
                             saleorderline_info = model2.read(line_id, ["id", "name", "product_id",
                                                                        "product_uom_qty", "product_uom", "price_unit",
                                                                        "price_subtotal", "tax_id", "order_id"])
-                            saleorder_info['saleRequestLines'] = saleorderline_info
+
+                            saleorder_info['saleOrderLineList'] = [saleorderline_info]
+
+                            tax_id = saleorderline_info["tax_id"]
+
+                            tax_ids = model_tax.search([("id","in",tax_id)])
+                            for id in tax_ids:
+                                tax_info = model_tax.read(id,["id","name"])
+
+                                saleorderline_info["taxList"] = [tax_info]
 
                             result.append(saleorder_info)
                 record_count += 1
@@ -845,6 +854,7 @@ def get_salepricereq():
         if connection:
             model = connection.get_model("sale.price.req")
             model2 = connection.get_model("sale.price.req.line")
+
             ids = model.search(['|', ("name", "=", request_name), ("partner_id", "=", customer_id)])
             record_count = 0
             do_count = 0
