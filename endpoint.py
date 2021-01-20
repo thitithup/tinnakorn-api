@@ -4,6 +4,7 @@
 from flask import Flask, jsonify, request, abort
 import logging
 import odoolib
+import json
 
 app = Flask(__name__)
 
@@ -145,6 +146,7 @@ def get_products():
                                                            "manu_short", "origin_country", "product_function",
                                                            "fin_categ_id", "product_tmpl_id", "finishedCategoryList"])
                         result.append(product_info)
+
                 record_count += 1
     # sample_result = [
     #     {
@@ -173,7 +175,8 @@ def get_products():
     #         "finishedCategoryList": []
     #     }
     # ]
-    return jsonify(result), 200
+    # return jsonify(result), 200
+    return json.dumps(result, ensure_ascii=False, encoding='utf8')
 
 
 @app.route('/getCategories', methods=['GET'])
@@ -204,7 +207,8 @@ def get_categories():
                 categ_info = category_model.read(categ_id,
                                                  ["id", "name"])
                 result.append(categ_info)
-    return jsonify(result), 200
+        # return jsonify(result), 200
+    return json.dumps(result, ensure_ascii=False, encoding='utf8')
 
 
 @app.route('/getCountries', methods=['GET'])
@@ -280,14 +284,25 @@ def get_customers():
                                            "city", "zip", "function",
                                            "phone", "mobile", "email_print",
                                            "fax", "comment", "country_id", "is_company", "child_ids"])
-                        fullAddress = "{} {} {} {}".format(info['street'], info['street2'], info['city'], info['zip'])
+
+                        street = json.dumps(info["street"])
+                        street2 = json.dumps(info["street2"])
+                        city = json.dumps(info["city"])
+                        zip = json.dumps(info["zip"])
+                        # fullAddress = "{} {} {} {}".format(info['street'], info['street2'], info['city'], info['zip'])
+                        # info['fullAddress'] = fullAddress
+                        fullAddress = "{} {} {} {}".format(street,street2,city,zip)
                         info['fullAddress'] = fullAddress
-                        info['contactList'] = info['chil_ids']
+                        info['contactList'] = info['child_ids']
                         info.pop('chil_ids', None)
+
+                        print("fullAddress",type(json.dumps(fullAddress)))
+
                         result.append(info)
                 record_count += 1
 
-    return jsonify(result), 200
+    # return jsonify(result), 200
+    return json.dumps(result, ensure_ascii=False, encoding='utf8')
 
 
 @app.route('/getDashboardDetails', methods=['GET'])
@@ -416,7 +431,8 @@ def get_logcalls():
     #         "finishedCategoryList": []
     #     }
     # ]
-    return jsonify(result), 200
+    # return jsonify(result), 200
+    return json.dumps(result, ensure_ascii=False, encoding='utf8')
 
 
 @app.route('/getOpportunities', methods=['GET'])
