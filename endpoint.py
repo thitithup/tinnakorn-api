@@ -523,6 +523,7 @@ def get_opportunities():
     # return jsonify(result), 200
     return json.dumps(result, ensure_ascii=False, encoding='utf8')
 
+
 @app.route('/getPriorities', methods=['GET'])
 def get_priorities():
     user_name = request.args.get('Username', False)
@@ -914,6 +915,382 @@ def get_salepricereq():
 
     # return jsonify(result), 200
     return json.dumps(result, ensure_ascii=False, encoding='utf8')
+
+
+@app.route('/postCustomers', methods=['POST'])
+def post_customers():
+    input = json.loads(request.data)
+
+    user_id = input["UserId"]
+    username = input["username"]
+    password = input["Password"]
+    company = input["Company"]
+    customer_id = input["CustomerId"]
+    customer_name = input["CustomerName"]
+    street = input["Address1"]
+    street2 = input["Address2"]
+    city = input["City"]
+    zip = input["Zip"]
+    customer_type = input["Customertype"]
+    phone = input["Phone"]
+    mobile = input["Mobile"]
+    email_print = input["EmailPrint"]
+
+    new_customer = {
+        'name': customer_name,
+        'street': street,
+        'street2': street2,
+        'city': city,
+        'zip': zip,
+        'phone': phone,
+        'mobile': mobile,
+        'user_id': user_id,
+        'is_company': True,
+        # 'email_print':email_print
+    }
+
+    result = {}
+
+    if username and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+
+        if connection:
+            partner_model = connection.get_model("res.partner")
+
+            ids = partner_model.search([("name", "=", customer_name), ("phone", "=", phone), ("mobile", "=", mobile)])
+
+            if not ids:
+                create_user = partner_model.create(new_customer)
+                result["customerId"] = create_user
+
+            else:
+                result["customerId"] = ids[0]
+
+    return jsonify(result), 200
+
+
+@app.route('/postCustomerContact', methods=['POST'])
+def post_customercontact():
+    input = json.loads(request.data)
+
+    user_id = input["UserId"]
+    username = input["username"]
+    password = input["Password"]
+    company = input["Company"]
+    customer_id = input["CustomerId"]
+    customer_contact_id = input["CustomerContactId"]
+    contact_name = input["ContactName"]
+    contact_type = input["Contacttype"]
+    phone = input["Phone"]
+    mobile = input["Mobile"]
+    email_print = input["EmailPrint"]
+    jobposition = input["JobPosition"]
+
+    new_customer = {
+        'name': contact_name,
+        # 'contact_type':contact_type,
+        'parent_id': customer_id,
+        'phone': phone,
+        'mobile': mobile,
+        'user_id': user_id,
+        'function': jobposition,
+        # 'email_print':email_print
+    }
+
+    result = {}
+
+    if username and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+
+        if connection:
+            partner_model = connection.get_model("res.partner")
+
+            ids = partner_model.search([("name", "=", contact_name), ("phone", "=", phone), ("mobile", "=", mobile)])
+
+            if not ids:
+                create_contact = partner_model.create(new_customer)
+                result["customerContactId"] = create_contact
+
+            else:
+                result["customerContactId"] = ids[0]
+
+    return jsonify(result), 200
+
+
+@app.route('/postLoggedCalls', methods=['POST'])
+def post_loggedcalls():
+    input = json.loads(request.data)
+
+    user_id = input["UserId"]
+    username = input["username"]
+    password = input["Password"]
+    company = input["Company"]
+    log_id = input["LoggedCallId"]
+    customer_id = input["CustomerId"]
+    opportunity_id = input["OpportunityId"]
+    date = input["Date"]
+    log_name = input["LoggedName"]
+    description = input["Description"]
+    category_id = input["CategoryId"]
+
+    new_log = {
+        'partner_id': customer_id,
+        'opportunity_id': opportunity_id,
+        'date': date,
+        'name': log_name,
+        'description': description,
+        'categ_id': category_id,
+        'user_id': user_id
+    }
+
+    result = {}
+
+    if username and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+
+        if connection:
+            crm_logcall_model = connection.get_model("crm.phonecall")
+
+            ids = crm_logcall_model.search([("name", "=", log_name), ("user_id", "=", user_id), ("date", "=", date)])
+
+            if not ids:
+                create_log = crm_logcall_model.create(new_log)
+                result["loggedCallId"] = create_log
+
+            else:
+                result["loggedCallId"] = ids[0]
+
+    return jsonify(result), 200
+
+
+@app.route('/postOpportunities', methods=['POST'])
+def post_opportunities():
+    input = json.loads(request.data)
+
+    user_id = input["UserId"]
+    username = input["username"]
+    password = input["Password"]
+    company = input["Company"]
+    opportunities_id = input["OpportunitiesId"]
+    customer_id = input["CustomerId"]
+    opportunities_name = input["OpportunitiesName"]
+    contact_name = input["ContactName"]
+    stage_id = input["StageId"]
+    description = input["Description"]
+    priority = input["Priority"]
+    plannedrevenue = input["PlannedRevenue"]
+    probability = input["Probability"]
+    type = input["type"]
+
+    new_opp = {
+        'name': opportunities_name,
+        'partner_id': customer_id,
+        'contact_name': contact_name,
+        'stage_id': stage_id,
+        'description': description,
+        'priority': priority,
+        'plannedrevenue': plannedrevenue,
+        'probability': probability,
+        'type': type,
+        'user_id': user_id
+    }
+
+    result = {}
+
+    if username and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+
+        if connection:
+            crm_lead_model = connection.get_model("crm.lead")
+
+            ids = crm_lead_model.search([])
+
+            if not ids:
+                create_opp = crm_lead_model.create(new_opp)
+                result["opportunitiesId"] = create_opp
+
+            else:
+                result["opportunitiesId"] = ids[0]
+
+    return jsonify(result), 200
+
+
+@app.route('/postTaskMessage', methods=['POST'])
+def post_taskmessage():
+    input = json.loads(request.data)
+
+    user_id = input["UserId"]
+    username = input["username"]
+    password = input["Password"]
+    company = input["Company"]
+    message_type = input["MessageType"]
+    message = input["Message"]
+    attachment = input["Attachment"]
+
+
+    new_message = {
+        'name': message,
+        'message_type': message_type,
+        'attachment': attachment,
+        'user_id': user_id
+    }
+
+    result = {}
+
+    if username and password and company:
+        connection = False
+        if company == 'Tinnakorn-TKM':
+            connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'Tinnakorn-TKC':
+            connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+        elif company == 'wso':
+            connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                login=username, password=password)
+            connection.check_login()
+
+        if connection:
+            web_task_model = connection.get_model("ineco.web.task")
+
+            ids = web_task_model.search([])
+
+            if not ids:
+                create_message = web_task_model.create(new_message)
+                result["webTaskId"] = create_message
+
+            else:
+                result["webTaskId"] = ids[0]
+
+    return jsonify(result), 200
+
+
+@app.route('/postSalesPriceRequest', methods=['POST'])
+def post_salespricerequest():
+    input = json.loads(request.data)
+
+    user_id = input["UserId"]
+    username = input["username"]
+    password = input["Password"]
+    company = input["Company"]
+    header_id = input["HeaderId"]
+    customer_product = input["CustomerProduct"]
+    customer_id = input["CustomerId"]
+    approver_id = input["ApproverId"]
+    request_date = input["RequestDate"]
+    SalePriceRequestLines = input["SalePriceRequestLines"]
+
+    for sale_req_id in SalePriceRequestLines:
+        prodcut_id = sale_req_id["ProductId"]
+        new_product = sale_req_id["IsNewProduct"]
+        qty_perorder = sale_req_id["QuantityPerOrder"]
+        qty_peryear = sale_req_id["QuantityPerYear"]
+        unitofmeasure = sale_req_id["UnitOfMeasure"]
+
+        new_req = {
+            'partner_fin_product':customer_product,
+            'partner_id':customer_id,
+            'approver_id':approver_id,
+            'request_date':request_date,
+            'user_id':user_id
+            # 'header_id':header_id
+        }
+
+        new_req_line = {
+            'product_id': prodcut_id,
+            'is_new_product':new_product,
+            'quantity_time':qty_perorder,
+            'quantity_year':qty_peryear,
+            'uom':unitofmeasure
+
+        }
+
+        result = {}
+
+        if username and password and company:
+            connection = False
+            if company == 'Tinnakorn-TKM':
+                connection = odoolib.get_connection(hostname="192.168.1.23", database=company, \
+                                                    login=username, password=password)
+                connection.check_login()
+            elif company == 'Tinnakorn-TKC':
+                connection = odoolib.get_connection(hostname="192.168.1.21", database=company, \
+                                                    login=username, password=password)
+                connection.check_login()
+            elif company == 'wso':
+                connection = odoolib.get_connection(hostname="192.168.1.25", database=company, \
+                                                    login=username, password=password)
+                connection.check_login()
+
+            if connection:
+                sale_req_model = connection.get_model("sale.price.req")
+                sale_req_line_model = connection.get_model("sale.price.req.line")
+
+                ids = sale_req_model.search([("partner_id","=",customer_id),("partner_fin_product","=",customer_product),
+                                             ("approver_id","=",approver_id),("request_date","=",request_date)])
+
+                if not ids:
+                    create_sale_req = sale_req_model.create(new_req)
+                    result["salesPriceRequestId"] = create_sale_req
+                    new_req_line["request_id"] = create_sale_req
+                    create_sale_req_line = sale_req_line_model.create(new_req_line)
+
+                else:
+                    result["salesPriceRequestId"] = ids[0]
+                    new_req_line["request_id"] = ids[0]
+                    create_sale_req_line = sale_req_line_model.create(new_req_line)
+
+        return jsonify(result), 200
 
 
 if __name__ == '__main__':
